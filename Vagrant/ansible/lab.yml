@@ -1,0 +1,7 @@
+- hosts: windows
+  tasks:
+    - name: Remove Appx packages (and their hindering file assocations)
+      win_shell: |
+        Get-AppxPackage -name "Microsoft.BingWeather" | Remove-AppxPackage
+        Get-AppxPackage -name "microsoft.windowscommunicationsapps" | Remove-AppxPackage
+

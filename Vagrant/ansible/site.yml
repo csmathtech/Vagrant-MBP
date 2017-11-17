@@ -1,0 +1,28 @@
+---
+- name: apply common configuration to all nodes
+  hosts: all
+  become: true
+  roles:
+   - common
+#   - ntp
+#   - pam
+
+#- name:  configure and deloy the webservers and application code
+#  hosts: webservers
+#  remote_user: root
+
+#  roles:
+#   - httpd
+
+#- name: install and config glusterfs
+#  hosts: glusterfshosts
+#  roles:
+#   - glusterfs
+
+#- name: deploy Mariadb and configure the database
+#  hosts: dbservers
+#  remote_user: root
+
+#  roles:
+#   - db
+

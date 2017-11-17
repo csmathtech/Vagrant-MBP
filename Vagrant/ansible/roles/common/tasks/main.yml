@@ -1,0 +1,41 @@
+---
+- name: Copy the EPEL repository definition
+  template: src=epel7.repo dest=/etc/yum.repos.d/epel.repo
+
+- name: Create the GPG key for EPEL
+  template: src=RPM-GPG-KEY-EPEL-7 dest=/etc/pki/rpm-gpg
+
+- name: Install all updates via yum
+  yum: name=* state=present
+
+- name: Install common dependencies
+  yum: name={{ item }} state=installed
+  with_items:
+  - libselinux-python
+  - libsemanage-python
+  - fail2ban
+  - nano
+  - wget
+
+- name: Create .ssh folder
+  file: path=/root/.ssh state=directory mode=0700
+
+
+- name: Copy control and tech keys
+  template: src=authorized_keys.public dest=/root/.ssh/authorized_keys
+
+- name: Edit sshd_config - remove any PermitRootLogin yes
+  lineinfile: dest=/etc/ssh/sshd_config regexp="PermitRootLogin yes" state=absent
+  notify: restart sshd
+
+- name: Edit sshd_config with without-password
+  lineinfile: dest=/etc/ssh/sshd_config line='PermitRootLogin without-password' insertafter='^# Authentication' state=present
+  notify: restart sshd
+
+- name: Configure fail2ban
+  template: src=f2b-ssh.conf.j2 dest=/etc/fail2ban/jail.d/sshd.local
+  notify: "restart firewall and fail2ban"
+
+- name: Start the fail2ban service
+  service: name=fail2ban state=started enabled=yes
+

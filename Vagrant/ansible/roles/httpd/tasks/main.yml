@@ -1,0 +1,31 @@
+---
+- name: "Install Latest version of Apache (httpd)"
+  yum: name=httpd state=latest
+
+# - name: Copying the start pages 
+#   template: src=${item.0} dest=${item.1}
+#   with_items:
+#      - [ 'foo.j2', '/etc/splat/foo.conf' ]
+#      - [ 'bar.j2', '/etc/splat/bar.conf' ]
+#   notify: 
+#      - restart fooserv 
+
+- name: create x template
+  template: src={{ item }} dest=/var/www/html/{{ item | basename | regex_replace('\.j2','') }} owner=apache group=apache mode=0644 
+  with_fileglob:
+    - "*.j2"
+  notify: restart httpd
+
+- name: Enable httpd
+  service: name=httpd enabled=yes
+  notify: restart httpd
+
+- name: Add firewall https rules
+  firewalld: service=https permanent=yes state=enabled
+  notify: restart firewalld
+
+- name: Add firewall http rules
+  firewalld: service=http permanent=yes state=enabled
+  notify: restart firewalld
+
+

@@ -1,0 +1,44 @@
+---
+- name: Install Glusterfs from SIG repo
+  template: src=CentOS-Gluster-3.10.repo dest=/etc/yum.repos.d/CentOS-Gluster-3.10.repo
+
+- name: Install Glusterfs SIG Key
+  template: src=RPM-GPG-KEY-CentOS-SIG-Storage dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Storage
+
+- name: Install Glusterfs 
+  yum: name={{ item }} state=installed
+  with_items:
+   - glusterfs-libs 
+   - glusterfs 
+   - glusterfs-client-xlators 
+   - glusterfs-api 
+   - glusterfs-server 
+   - glusterfs-cli
+
+
+- name: add firewall entry for glusterfs and NFS
+  firewalld: service={{ item }} permanent=yes state=enabled
+  with_items:
+  - glusterfs
+  - nfs
+  - rpc-bind
+  notify: restart firewalld
+
+- name: Start Glusterfs service
+  service: name=glusterd state=started enabled=yes
+
+- name: Make folder path for gluster
+  file: path=/glusterfs/data state=directory
+
+- name: Create the volume
+  gluster_volume: 
+   name:gluster1 
+   state:present 
+   brick:/glusterfs/data 
+   replicas:2 
+   host:"{{ inventory_hostname }}" 
+   transport:tcp 
+   cluster:
+    - 142.51.24.74
+    - 142.51.24.62
+   run_once: true

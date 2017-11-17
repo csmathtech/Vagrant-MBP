@@ -1,0 +1,17 @@
+---
+# - name: restart ntp
+#   service: name=ntpd state=restarted
+
+- name: restart fail2ban
+  service: name=fail2ban state=restarted
+#   shell: echo fail2ban restarted
+  listen: "restart firewall and fail2ban"
+
+- name: restart firewalld
+  service: name=firewalld state=restarted
+#   command: echo Firewall restarted
+  listen: "restart firewall and fail2ban"
+
+- name: restart sshd
+  service: name=sshd state=restarted
+

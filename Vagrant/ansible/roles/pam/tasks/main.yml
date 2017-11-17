@@ -1,0 +1,4 @@
+---
+- name: Copy PAM template for password quality
+  template: src=pwquality.conf.j2 dest=/etc/security/pwquality.conf mode=744
+

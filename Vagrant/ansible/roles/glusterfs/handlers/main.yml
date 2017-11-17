@@ -1,0 +1,7 @@
+---
+- name: restart glusterd
+  service: name=glusterd state=restarted
+
+- name: restart firewalld
+  service: name=firewalld state=restarted
+
